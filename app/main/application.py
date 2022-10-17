@@ -1,6 +1,8 @@
 import discord
 
+from tasks.health_check.setup import HealthCheckManager
 from tasks.office_attendance.setup import OfficeAttendanceManager
+
 from config.discord_client import DiscordClient
 
 
@@ -16,6 +18,5 @@ class Application:
         self.discord_client.connect(on_connect)
 
     async def setup_tasks(self, client: discord.Client):
-        office_attendance_manager = OfficeAttendanceManager()
-
-        await office_attendance_manager.setup(client)
+        await OfficeAttendanceManager().setup(client)
+        await HealthCheckManager().setup(client)
