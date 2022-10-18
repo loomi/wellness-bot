@@ -13,11 +13,11 @@ isort==5.10.1
 lazy-object-proxy==1.7.1
 mccabe==0.7.0
 multidict==6.0.2
-pkg_resources==0.0.0
 platformdirs==2.5.2
 pycodestyle==2.9.1
 pylint==2.15.3
 python-dotenv==0.21.0
+schedule==1.1.0
 toml==0.10.2
 tomli==2.0.1
 tomlkit==0.11.5
