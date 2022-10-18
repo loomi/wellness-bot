@@ -10,17 +10,17 @@ class CountAttendanceMessagesService(ITaskService):
     client: discord.Client = None
 
     async def execute(self):
-        @on_message_subscriber('count-attendance', is_dm=True)
+        @on_message_subscriber('contagem', is_dm=True)
         async def on_message(message: discord.Message):
             date_regex = '[0-9]{2}/[0-9]{2}/[0-9]{4}'
-            message_regex = f'^!count-attendance ({date_regex})( {date_regex})?$'
+            message_regex = f'^!contagem ({date_regex})( {date_regex})?$'
             message_pattern = re.compile(message_regex)
 
             match = message_pattern.match(message.content)
 
             if not match:
                 error_message = 'Formato inválido, exemplo:\n' \
-                    '**!count-attendance [data inicial]**'
+                    '**!contagem [data inicial] [data final]**'
 
                 await message.channel.send(error_message)
 
@@ -47,7 +47,8 @@ class CountAttendanceMessagesService(ITaskService):
             now = datetime.now()
             now_formatted = datetime.now().strftime('%d/%m/%Y')
             start_datetime = datetime.strptime(start_date, '%d/%m/%Y')
-            end_datetime = datetime.strptime(end_date, '%d/%m/%Y') if end_date else now
+            end_datetime = datetime.strptime(
+                end_date, '%d/%m/%Y') if end_date else now
 
             await message.channel.send('Iniciando contagem de presença 🤓:\n\n'
                                        f'Data inicial: {start_date}\n'
@@ -79,19 +80,21 @@ class CountAttendanceMessagesService(ITaskService):
 
             for reaction in reactions:
                 if reaction.emoji == '📍':
-                    attended_users = [user async for user in reaction.users()]
-
-                    for user in attended_users:
+                    async for user in reaction.users():
                         if user.id == self.client.user.id:
                             continue
 
-                        if not user.name in user_attendance_dict:
-                            user_attendance_dict[user.name] = 0
+                        if not user.id in user_attendance_dict:
+                            user_attendance_dict[user.id] = {
+                                'name': user.display_name, 'count': 0}
 
-                        user_attendance_dict[user.name] += 1
+                        prev_dict = user_attendance_dict[user.id]
+
+                        user_attendance_dict[user.id] = {
+                            **prev_dict, 'count': prev_dict['count'] + 1}
 
             users_padded_by_ht = [
-                f'{user}	{count}' for user, count in user_attendance_dict.items()]
+                f'{user["name"]}	{user["count"]}' for user in user_attendance_dict.values()]
 
             file_content = '\n'.join(users_padded_by_ht)
 
