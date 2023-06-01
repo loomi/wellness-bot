@@ -27,7 +27,7 @@ class SendAttendanceMessageService(ITaskService):
 
         message = await self.client.get_channel(target_channel.id).send(message)
 
-        emojis = ['📍', '💻']
+        emojis = ['📍', '💻', '🕰️']
 
         for emoji in emojis:
             await message.add_reaction(emoji)
